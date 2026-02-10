@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SmartPick: Solução de IA e Realidade Aumentada para otimização de armazéns. Reduz percursos em 30%, elimina erros de picking e integra com o teu WMS existente.">
+    <meta name="keywords" content="otimização armazém, realidade aumentada picking, óculos inteligentes logística, IA armazém, WMS inteligente, picking automation">
+    <title>SmartPick - IA para Armazéns Eficientes</title>
+    
+    <!-- Google Fonts - Using distinctive pairing -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Placeholder for Google Analytics -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script> -->
+    <script>
+        // window.dataLayer = window.dataLayer || [];
+        // function gtag(){dataLayer.push(arguments);}
+        // gtag('js', new Date());
+        // gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+
+    <style>
+        /* ==================== CSS VARIABLES ==================== */
+        :root {
+            --color-primary: #1E3A8A;
+            --color-primary-dark: #0F1F4A;
+            --color-accent: #10B981;
+            --color-accent-light: #34D399;
+            --color-bg: #F8FAFC;
+            --color-bg-alt: #FFFFFF;
+            --color-text: #1E293B;
+            --color-text-light: #64748B;
+            --color-border: #E2E8F0;
+            
+            --font-display: 'DM Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* ==================== RESET & BASE ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-display);
+            color: var(--color-text);
+            background: var(--color-bg);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ==================== TYPOGRAPHY ==================== */
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        .mono {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            letter-spacing: -0.02em;
+        }
+
+        /* ==================== NAVIGATION ==================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 1000;
+            transition: var(--transition-smooth);
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: var(--transition-smooth);
+            font-size: 0.95rem;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-accent);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-link:hover {
+            color: var(--color-primary);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--color-primary);
+            border-radius: 2px;
+            transition: var(--transition-smooth);
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background grid */
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50px;
+            color: var(--color-accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            color: white;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--color-accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition-bounce);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
+            background: var(--color-accent-light);
+        }
+
+        /* ==================== SECTION STYLES ==================== */
+        .section {
+            padding: 6rem 2rem;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .section:nth-child(even) {
+            background: var(--color-bg-alt);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            color: var(--color-accent);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+
+        .section-description {
+            color: var(--color-text-light);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ==================== PROBLEM CARDS ==================== */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .problem-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid var(--color-border);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            transform: scaleX(0);
+            transition: var(--transition-smooth);
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+            border-color: var(--color-accent);
+        }
+
+        .problem-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .problem-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .problem-stat {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-title {
+            font-size: 1.3rem;
+            color: var(--color-primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .problem-description {
+            color: var(--color-text-light);
+            line-height: 1.7;
+        }
+
+        /* ==================== SOLUTION SECTION ==================== */
+        .solution-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .solution-text h3 {
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-text p {
+            color: var(--color-text-light);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .solution-features {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .solution-features li {
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-left: 3px solid var(--color-accent);
+            margin-bottom: 0.8rem;
+            border-radius: 4px;
+            font-size: 1.05rem;
+        }
+
+        .solution-features li strong {
+            color: var(--color-primary);
+        }
+
+        .solution-boxes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .solution-box {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.05), rgba(16, 185, 129, 0.05));
+            border-radius: 16px;
+            padding: 3rem;
+            border: 2px dashed var(--color-border);
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+
+        .solution-box:hover {
+            transform: translateY(-5px);
+            border-color: var(--color-accent);
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.15);
+        }
+
+        .solution-box-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .solution-box h4 {
+            color: var(--color-primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .solution-box p {
+            color: var(--color-text-light);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* ==================== BENEFITS SECTION ==================== */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .benefit-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: var(--transition-smooth);
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.15);
+        }
+
+        .benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .benefit-title {
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .benefit-description {
+            color: var(--color-text-light);
+            line-height: 1.7;
+        }
+
+        /* ==================== PROTOTYPES SECTION ==================== */
+        .prototype-video {
+            background: var(--color-primary);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+        }
+
+        .prototype-video iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            display: block;
+        }
+
+        .prototype-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .prototype-image {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transition: var(--transition-smooth);
+        }
+
+        .prototype-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .prototype-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .prototype-image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: white;
+            padding: 2rem 1.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .prototype-status {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--color-accent);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .prototype-status p {
+            color: var(--color-text);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .prototype-status strong {
+            color: var(--color-accent);
+        }
+
+        /* ==================== CONTACT SECTION ==================== */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--color-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-error {
+            color: #EF4444;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .contact-intro {
+            color: var(--color-text-light);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .contact-details {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-item-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .contact-item-content h4 {
+            color: var(--color-primary);
+            margin-bottom: 0.3rem;
+            font-size: 1rem;
+        }
+
+        .contact-item-content p {
+            color: var(--color-text-light);
+        }
+
+        .contact-item-content a {
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+
+        .contact-item-content a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-map {
+            border-radius: 12px;
+            overflow: hidden;
+            height: 300px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-map iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            background: var(--color-primary-dark);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 3rem 2rem 1.5rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .footer-description {
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer-section h4 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.7rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--color-accent);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 968px) {
+            .nav-menu {
+                position: fixed;
+                top: 72px;
+                left: -100%;
+                width: 100%;
+                flex-direction: column;
+                background: white;
+                padding: 2rem;
+                gap: 1.5rem;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+                transition: var(--transition-smooth);
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .mobile-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(8px, 8px);
+            }
+
+            .mobile-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .mobile-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -7px);
+            }
+
+            .solution-content,
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .prototype-video iframe {
+                height: 400px;
+            }
+
+            .section {
+                padding: 4rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero {
+                padding: 6rem 1.5rem 3rem;
+            }
+
+            .problem-grid,
+            .benefits-grid,
+            .prototype-gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .prototype-video iframe {
+                height: 300px;
+            }
+        }
+
+        /* ==================== UTILITIES ==================== */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-2 {
+            margin-top: 2rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== NAVIGATION ==================== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#inicio" class="logo">
+                <!-- <span class="logo-icon">🎯</span> -->
+                <span>SmartPick</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#inicio" class="nav-link">Início</a></li>
+                <li><a href="#solucao" class="nav-link">Solução</a></li>
+                <li><a href="#prototipos" class="nav-link">Protótipos</a></li>
+                <li><a href="#contacto" class="nav-link">Contacto</a></li>
+            </ul>
+            <div class="mobile-toggle" id="mobileToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero" id="inicio">
+        <div class="hero-container">
+            <div class="hero-content">
+                <span class="hero-tag">🚀 Inovação em Logística</span>
+                <h1>SmartPick: Otimiza o teu armazém com IA e Realidade Aumentada</h1>
+                <p class="hero-subtitle">
+                    Reduz percursos desnecessários, elimina erros e poupa tempo. Software inteligente que integra com o teu WMS existente e óculos inteligentes para picking hands-free.
+                </p>
+                <a href="#contacto" class="cta-button">Solicita Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PROBLEM SECTION ==================== -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">O DESAFIO</span>
+                <h2 class="section-title">Problemas Reais em Armazéns Modernos</h2>
+                <p class="section-description">
+                    Armazéns de grande escala enfrentam desafios críticos que afetam produtividade, custos e satisfação do cliente
+                </p>
+            </div>
+            
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">🚶</div>
+                    <div class="problem-stat">25 km/dia</div>
+                    <h3 class="problem-title">Percursos Desperdiçados</h3>
+                    <p class="problem-description">
+                        Cada operador percorre em média 25 km por dia em rotas não otimizadas, resultando em fadiga e perda de tempo valioso.
+                    </p>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">⏱️</div>
+                    <div class="problem-stat">35%</div>
+                    <h3 class="problem-title">Tempo Perdido</h3>
+                    <p class="problem-description">
+                        35% do tempo de trabalho é desperdiçado em tarefas ineficientes como procura de produtos e deslocações desnecessárias.
+                    </p>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">❌</div>
+                    <div class="problem-stat">1-3%</div>
+                    <h3 class="problem-title">Erros de Picking</h3>
+                    <p class="problem-description">
+                        Entre 1-3% das encomendas contêm erros, gerando devoluções, custos adicionais e insatisfação dos clientes.
+                    </p>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">📦</div>
+                    <div class="problem-stat">Stock</div>
+                    <h3 class="problem-title">Inventário Desatualizado</h3>
+                    <p class="problem-description">
+                        Diferenças entre sistema e stock real causam ruturas, vendas perdidas e dificuldades no planeamento de reposição.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SOLUTION SECTION ==================== -->
+        <section class="section" id="solucao">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">A SOLUÇÃO</span>
+                <h2 class="section-title">IA + Realidade Aumentada = Eficiência Total</h2>
+            </div>
+
+            <div class="solution-content">
+                <div class="solution-text">
+                    <h3>Como Funciona o SmartPick</h3>
+                    <p>
+                        <strong>Cérebro IA:</strong> Analisa em tempo real a procura e histórico para otimizar o layout dinâmico do armazém e calcular as rotas mais eficientes para cada operador.
+                    </p>
+                    <p>
+                        <strong>Óculos Inteligentes:</strong> Compatíveis com modelos existentes no mercado (apoiamos aquisição via parceiros certificados). Não vendemos hardware, apenas software.
+                    </p>
+                    
+                    <ul class="solution-features">
+                        <li><strong>Navegação AR:</strong> Setas discretas projetadas no chão guiam o operador</li>
+                        <li><strong>Info Contextual:</strong> Distância e localização (ex: "47m → Corredor B, Estante 23")</li>
+                        <li><strong>Realce Visual:</strong> Produto destacado automaticamente na prateleira</li>
+                        <li><strong>Scan Hands-Free:</strong> Confirmação automática por reconhecimento visual</li>
+                        <li><strong>Stock Real-Time:</strong> Atualização instantânea no WMS existente</li>
+                    </ul>
+                </div>
+
+                <div class="solution-boxes">
+                    <div class="solution-box">
+                        <span class="solution-box-icon">🧠</span>
+                        <h4>Cérebro Inteligente</h4>
+                        <p>Motor de IA analisa padrões de procura, histórico de picking e otimiza continuamente o layout e rotas do armazém</p>
+                    </div>
+
+                    <div class="solution-box">
+                        <span class="solution-box-icon">👓</span>
+                        <h4>Software de Realidade Aumentada</h4>
+                        <p>Interface AR nos óculos inteligentes com navegação visual, realce de produtos e confirmação automática hands-free</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== BENEFITS SECTION ==================== -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">BENEFÍCIOS</span>
+                <h2 class="section-title">Impacto Mensurável no Teu Armazém</h2>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">📉</div>
+                    <h3 class="benefit-title">Redução de Distâncias 30%+</h3>
+                    <p class="benefit-description">
+                        Rotas otimizadas por IA reduzem percursos em mais de 30%, diminuindo fadiga e aumentando o número de picks por hora.
+                    </p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">✅</div>
+                    <h3 class="benefit-title">Zero Erros de Picking</h3>
+                    <p class="benefit-description">
+                        Scan automático e realce visual eliminam erros humanos. Stock atualizado em tempo real previne ruturas.
+                    </p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🙌</div>
+                    <h3 class="benefit-title">Operação <br>Hands-Free</h3>
+                    <p class="benefit-description">
+                        Mãos livres para manipular produtos. Menos fadiga, mais produtividade e segurança no trabalho.
+                    </p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🌱</div>
+                    <h3 class="benefit-title">Sustentabilidade</h3>
+                    <p class="benefit-description">
+                        Menos quilómetros percorridos significa menor consumo energético e pegada de carbono reduzida.
+                    </p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔌</div>
+                    <h3 class="benefit-title">Integração Fácil</h3>
+                    <p class="benefit-description">
+                        Camada de software sobre o teu WMS existente. Sem necessidade de substituir sistemas legacy.
+                    </p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h3 class="benefit-title">ROI Comprovado</h3>
+                    <p class="benefit-description">
+                        Protótipo validado com dados reais. Retorno do investimento mensurável em 6-12 meses.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PROTOTYPES SECTION ==================== -->
+    <section class="section" id="prototipos">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">DEMONSTRAÇÃO</span>
+                <h2 class="section-title">Protótipos e Demo</h2>
+                <p class="section-description">
+                    Vê o SmartPick em ação: simulações AR e dashboard de IA em desenvolvimento
+                </p>
+            </div>
+
+            <!-- Video Demo -->
+            <!-- <div class="prototype-video">
+                <iframe 
+                    src="https://www.youtube.com/embed/GdvH-cxLJ6U" 
+                    title="SmartPick Demo: AR Navigation em Armazém" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div> -->
+
+            <!-- Image Gallery -->
+            <div class="prototype-gallery">
+                <div class="prototype-image">
+                    <img src="imgs/MeioCaminho.png" alt="Simulação AR - Navegação">
+                    <div class="prototype-image-caption">
+                        Vista em 1ª pessoa: Setas AR guiam o operador pelo caminho ideal
+                    </div>
+                </div>
+
+                <div class="prototype-image">
+                    <img src="imgs/Caixa.png" alt="Simulação AR - Realce de Produto">
+                    <div class="prototype-image-caption">
+                        Realce visual automático identifica o produto correto
+                    </div>
+                </div>
+
+                <div class="prototype-image">
+                    <img src="imgs/DashBoard.png" alt="Dashboard IA">
+                    <div class="prototype-image-caption">
+                        Dashboard de IA sugere reorganização dinâmica do layout
+                    </div>
+                </div>
+
+                <!-- <div class="prototype-image">
+                    <img src="https://via.placeholder.com/800x450/10B981/FFFFFF?text=%C3%93culos+Inteligentes+3D" alt="Óculos Inteligentes">
+                    <div class="prototype-image-caption">
+                        Compatível com óculos AR existentes no mercado
+                    </div>
+                </div>
+
+                <div class="prototype-image">
+                    <img src="https://via.placeholder.com/800x450/1E3A8A/FFFFFF?text=Interface+Hands-Free" alt="Interface Operador">
+                    <div class="prototype-image-caption">
+                        Interface minimalista com comandos de voz e gestos
+                    </div>
+                </div>
+
+                <div class="prototype-image">
+                    <img src="https://via.placeholder.com/800x450/10B981/FFFFFF?text=An%C3%A1lise+de+Rotas+em+Tempo+Real" alt="Análise de Rotas">
+                    <div class="prototype-image-caption">
+                        Análise em tempo real de eficiência e métricas
+                    </div>
+                </div> -->
+            </div>
+
+            <!-- Current Status -->
+            <div class="prototype-status">
+                <p>
+                    <strong>Fase Atual:</strong> Prototipagem avançada com maquetes AR funcionais e módulo de IA testado com datasets simulados.
+                    <br><br>
+                    <strong>Próximos Passos:</strong> Integração com dados reais de armazéns parceiros e testes piloto em ambiente produtivo.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CONTACT SECTION ==================== -->
+    <section class="section" id="contacto">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">CONTACTO</span>
+                <h2 class="section-title">Vamos Conversar</h2>
+                <p class="section-description">
+                    Solicita demonstração, discute parcerias ou propõe um Proof of Concept
+                </p>
+            </div>
+
+            <div class="contact-container">
+                <!-- Contact Form -->
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Nome *</label>
+                            <input type="text" id="name" name="name" required>
+                            <span class="form-error" id="nameError">Por favor, introduz o teu nome</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                            <span class="form-error" id="emailError">Por favor, introduz um email válido</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="company">Empresa *</label>
+                            <input type="text" id="company" name="company" required>
+                            <span class="form-error" id="companyError">Por favor, introduz o nome da empresa</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Mensagem *</label>
+                            <textarea id="message" name="message" required></textarea>
+                            <span class="form-error" id="messageError">Por favor, escreve uma mensagem</span>
+                        </div>
+
+                        <button type="submit" class="cta-button" style="width: 100%;">Enviar Mensagem</button>
+                    </form>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-info">
+                    <p class="contact-intro">
+                        Estamos em <strong>fase de validação</strong> e abertos a pilotos em armazéns reais. 
+                        Se geres um centro logístico e queres testar tecnologia de ponta, vamos falar.
+                    </p>
+
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-item-icon">✉️</div>
+                            <div class="contact-item-content">
+                                <h4>Email</h4>
+                                <p><a href="mailto:smartpick@exemplo.pt">smartpick@exemplo.pt</a></p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-item-icon">🔗</div>
+                            <div class="contact-item-content">
+                                <h4>LinkedIn</h4>
+                                <p><a href="https://linkedin.com/company/smartpick-pt" target="_blank">/smartpick-pt</a></p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-item-icon">📍</div>
+                            <div class="contact-item-content">
+                                <h4>Localização</h4>
+                                <p>Queluz, Lisboa, Portugal</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map -->
+                    <div class="contact-map">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d49451.36794183255!2d-9.259851999999999!3d38.757774!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd1ecfa7b3a7c7b9%3A0x500ebbde49124e0!2sQueluz%2C%20Portugal!5e0!3m2!1spt-PT!2spt!4v1234567890123!5m2!1spt-PT!2spt" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">SmartPick</div>
+                    <p class="footer-description">
+                        Solução de IA e Realidade Aumentada para otimização inteligente de armazéns. <br>
+                        Reduz custos, elimina erros e aumenta produtividade.
+                    </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Links Rápidos</h4>
+                    <ul class="footer-links">
+                        <li><a href="#inicio">Início</a></li>
+                        <li><a href="#solucao">Solução</a></li>
+                        <li><a href="#prototipos">Protótipos</a></li>
+                        <li><a href="#contacto">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#privacidade">Política de Privacidade</a></li>
+                        <li><a href="#termos">Termos de Serviço</a></li>
+                        <li><a href="#cookies">Gestão de Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 SmartPick. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ==================== NAVBAR SCROLL EFFECT ====================
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        // ==================== MOBILE MENU TOGGLE ====================
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        mobileToggle.addEventListener('click', () => {
+            mobileToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // ==================== FORM VALIDATION & SUBMISSION ====================
+        const contactForm = document.getElementById('contactForm');
+        
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const company = document.getElementById('company').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            // Reset errors
+            document.querySelectorAll('.form-error').forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            // Validation
+            let isValid = true;
+            
+            if (!name) {
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRegex.test(email)) {
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!company) {
+                document.getElementById('companyError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!message) {
+                document.getElementById('messageError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // Prepare form data
+            const formData = {
+                name,
+                email,
+                company,
+                message
+            };
+            
+            // ==================== FORMSPREE/EMAILJS INTEGRATION ====================
+            // Option 1: Formspree (replace YOUR_FORM_ID)
+            /*
+            try {
+                const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    alert('✅ Mensagem enviada com sucesso! Entraremos em contacto em breve.');
+                    contactForm.reset();
+                } else {
+                    throw new Error('Erro ao enviar');
+                }
+            } catch (error) {
+                alert('❌ Erro ao enviar mensagem. Por favor, tenta novamente ou contacta-nos diretamente via email.');
+            }
+            */
+            
+            // Option 2: EmailJS (replace YOUR_SERVICE_ID, YOUR_TEMPLATE_ID, YOUR_PUBLIC_KEY)
+            /*
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData, 'YOUR_PUBLIC_KEY')
+                .then(() => {
+                    alert('✅ Mensagem enviada com sucesso! Entraremos em contacto em breve.');
+                    contactForm.reset();
+                })
+                .catch(() => {
+                    alert('❌ Erro ao enviar mensagem. Por favor, tenta novamente ou contacta-nos diretamente via email.');
+                });
+            */
+            
+            // Placeholder success (remove when integrating real service)
+            alert(`✅ Mensagem enviada com sucesso!\n\nNome: ${name}\nEmail: ${email}\nEmpresa: ${company}\n\nPara ativar o envio real, configura Formspree ou EmailJS no código.`);
+            contactForm.reset();
+        });
+
+        // ==================== SCROLL ANIMATIONS ====================
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.animationPlayState = 'paused';
+            observer.observe(section);
+        });
+
+        // ==================== SMOOTH SCROLL FOR ANCHOR LINKS ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80; // Account for fixed navbar
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+
+    <!-- EmailJS SDK (uncomment if using EmailJS) -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script> -->
+    <!-- <script>
+        emailjs.init('YOUR_PUBLIC_KEY');
+    </script> -->
+</body>
+</html>
